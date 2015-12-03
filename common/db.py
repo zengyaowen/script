@@ -33,7 +33,7 @@ class Connection(object):
         except Exception:
             logging.error("Cannot connect to MySQL on %s", self.host,
                           exc_info=True)
-
+        
     def __del__(self):
         self.close()
 
@@ -46,6 +46,14 @@ class Connection(object):
     def commit(self):
         """Commit"""
         self._db.commit()
+
+    def begin(self):
+        """commit"""
+        self._db.begin()
+
+    def rollback(self):
+        """Rollback"""
+        self._db.rollback()
 
     def reconnect(self):
         """Closes the existing database connection and re-opens it."""
