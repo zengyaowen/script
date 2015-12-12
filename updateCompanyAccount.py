@@ -11,7 +11,7 @@ def initDB(ip, dbname, name, pwd):
 
 if __name__ == "__main__":
     COMPANYUSERID = 0
-    env = sys.argv[0]
+    env = sys.argv[1]
     config = Config(env)
     ip = config.getValue("db", "ip")
     username = config.getValue("db", "username")
@@ -37,12 +37,12 @@ if __name__ == "__main__":
             conn.begin()
             res = conn.execute_rowcount("UPDATE account SET `balance`=`balance`+%s,`data_version`=`data_version`+1 WHERE `data_version`=%s and `user_id`=0" %(sum,companyDataVersion))
             if res == 1:
-                for data in RevenueRes: 
+                for data in RevenueRes:
                     outOrderId = data["out_order_id"]
                     revenueDataVersion = data["data_version"]
                     conn.execute("UPDATE %s SET `status`=1 WHERE `out_order_id`='%s' and `data_version`=%s" %(revenueTableName,outOrderId,revenueDataVersion))
                 conn.commit()
             break
             i = i + 1
-        except:  
+        except:
             conn.rollback()

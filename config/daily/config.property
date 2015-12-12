@@ -3,3 +3,5 @@ ip = 182.92.173.180
 database = xiaomaiFinance
 username = xm_finance
 password = 123456
+[checkRecord]
+url = http://182.92.150.126:8081/app/chargeOrder/pay/check

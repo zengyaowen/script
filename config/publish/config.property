@@ -1,0 +1,7 @@
+[db]
+ip = rds7cw2rv6nc0rz518z3.mysql.rds.aliyuncs.com
+database = xiaomai_finance
+username = xm_finance
+password = wqK0oedh6c9Ojnk
+[checkRecord]
+url = https://finance.imxiaomai.com/app/chargeOrder/pay/check

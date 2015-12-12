@@ -2,7 +2,6 @@
 # encoding: utf-8
 
 import common.db
-import datetime
 import sys
 from common.config import Config
 from common.sendEmail import *
@@ -14,7 +13,9 @@ EMAIL_MESSAGE = ""
 #校验各个账户以及其对应的日志
 def checkData(todayData, yesterdayData, records):
     global EMAIL_MESSAGE
-    for key in list(set(todayData.keys() + yesterdayData.keys())):
+    #只校验非公司账号的一般用户账号
+    keys = list(set(todayData.keys() + yesterdayData.keys())).remove(1)
+    for key in keys:
         yesterdaySnapShot = yesterdayData.get(key)
         todaySnapShot = todayData.get(key)
         if yesterdaySnapShot is not None or todaySnapShot is not None:
@@ -105,6 +106,31 @@ def getRecord(YAD, TAD, recordsIter):
     return records
 
 
+def checkCompanyData(YAD, TAD, recordList, conn):
+    global EMAIL_MESSAGE    
+    unprocessRecords = conn.query("SELECT * FROM revenue_record where status = 0")
+    oldMoney = YAD['1']['balance'] if "1" in YAD else 0
+    todayMoney = TAD['1']['balance'] if "1" in TAD else 0
+    for record in recordList:
+        if record['user_id'] == 1:
+            oldMoney = oldMoney - record['money']
+        elif record['to_user_id'] == 1:
+            oldMoney = oldMoney + record['money']
+    for unprocessRecord in unprocessRecords:
+        if unprocessRecord['user_id'] == 1:
+            oldMoney = oldMoney - unprocessRecord['money']
+        elif unprocessRecord['to_user_id'] == 1:
+            oldMoney = oldMoney + unprocessRecord['money']
+    if oldMoney == todayMoney:
+        EMAIL_MESSAGE = EMAIL_MESSAGE + "the company record is valid\n"
+    else:
+        EMAIL_MESSAGE = EMAIL_MESSAGE + "the company record is invalid\n"
+        EMAIL_MESSAGE = EMAIL_MESSAGE + "yesterday account : " + YAD
+        EMAIL_MESSAGE = EMAIL_MESSAGE + "today account : " + TAD
+        EMAIL_MESSAGE = EMAIL_MESSAGE + "the relative record as follow"
+        EMAIL_MESSAGE = EMAIL_MESSAGE + ".".join(recordList) + "\n" + ",".join(unprocessRecords)
+
+
 def sendEmail(receivers):
     global EMAIL_MESSAGE
     email = emailSender()
@@ -141,5 +167,7 @@ if __name__ == "__main__":
         TAD[data['user_id']] = data
     records = getRecord(YAD, TAD, recordsIter)
     checkData(TAD, YAD, records)
-    checkRecord(TAD, YAD, records)
+    #checkRecord(TAD, YAD, records)
+    checkCompanyData(YAD, TAD, records["1"])
+    print(EMAIL_MESSAGE)
     sendEmail(['zengyaowen@imxiaomai.com', 'qiaoyang@imxiaomai.com'])

@@ -6,8 +6,8 @@ import ConfigParser
 
 class Config:
     dailyConfigPath = "./config/daily/config.property"
-    prepubConfigPath = "../config/prepub/config.property"
-    publishConfigPath = "../config/publish/config.property"
+    prepubConfigPath = "./config/prepub/config.property"
+    publishConfigPath = "./config/publish/config.property"
     cf = ConfigParser.ConfigParser()
     env = "daily"
 
